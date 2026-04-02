@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .modules.userClass import User,UserService
+from .modules.transactionClass import Transaction,TransactionService
 
 
 #default user creation
@@ -95,6 +96,8 @@ class LoginAPI(APIView):
                 message="Login failed",
                 errors={"detail": str(e)}
             )
+
+# User Management APIs **********************************************************************************
 
 class CreateUserAPI(APIView):
 
@@ -393,5 +396,289 @@ class ListUsersAPI(APIView):
                 success=False,
                 code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 message="Something went wrong",
+                errors={"detail": str(e)}
+            )
+            
+
+# Transaction Management APIs **************************************************************************
+
+class AddTransactionAPI(APIView):
+
+    def post(self, request):
+        request_user = get_request_user(request)
+
+        if not request_user:
+            return api_response(
+                success=False,
+                code=status.HTTP_401_UNAUTHORIZED,
+                message="Unauthorized - Invalid or missing token")
+
+        try:
+            amount = float(request.data["amount"])
+            t_type = request.data["type"]
+            category = request.data["category"]
+            notes = request.data.get("notes", "")
+
+        except KeyError as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Missing fields",
+                errors={"missing": str(e)}
+            )
+
+        try:
+            txn = TransactionService.addTransaction(request_user, amount, t_type, category, notes)
+
+            return api_response(
+                success=True,
+                code=status.HTTP_201_CREATED,
+                message="Transaction added",
+                data=txn.to_dict()
+            )
+
+        except PermissionError as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_403_FORBIDDEN,
+                message="Permission denied",
+                errors={"detail": str(e)}
+            )
+
+        except Exception as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Error",
+                errors={"detail": str(e)}
+            )
+            
+class UpdateTransactionAPI(APIView):
+
+    def put(self, request):
+        request_user = get_request_user(request)
+
+        if not request_user:
+            return api_response(
+                success=False,
+                code=status.HTTP_401_UNAUTHORIZED,
+                message="Unauthorized - Invalid or missing token")
+
+        try:
+            tid = request.data["tid"]
+
+        except KeyError:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Transaction ID required"
+            )
+
+        try:
+            # build dynamic update payload
+            update_fields = {}
+
+            if "amount" in request.data:
+                update_fields["amount"] = request.data["amount"]
+
+            if "type" in request.data:
+                update_fields["t_type"] = request.data["type"]
+
+            if "category" in request.data:
+                update_fields["category"] = request.data["category"]
+
+            if "notes" in request.data:
+                update_fields["notes"] = request.data["notes"]
+
+            # no fields passed
+            if not update_fields:
+                return api_response(
+                    success=False,
+                    code=status.HTTP_400_BAD_REQUEST,
+                    message="No fields provided to update"
+                )
+
+            txn = TransactionService.updateTransaction(
+                request_user,
+                tid,
+                **update_fields
+            )
+
+            return api_response(
+                success=True,
+                code=status.HTTP_200_OK,
+                message="Transaction updated",
+                data=txn.to_dict()
+            )
+
+        except PermissionError as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_403_FORBIDDEN,
+                message="Permission denied",
+                errors={"detail": str(e)}
+            )
+
+        except ValueError as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_404_NOT_FOUND,
+                message="Not found",
+                errors={"detail": str(e)}
+            )
+
+        except Exception as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Error",
+                errors={"detail": str(e)}
+            )
+            
+class DeleteTransactionAPI(APIView):
+
+    def delete(self, request):
+        request_user = get_request_user(request)
+
+        if not request_user:
+            return api_response(
+                success=False,
+                code=status.HTTP_401_UNAUTHORIZED,
+                message="Unauthorized - Invalid or missing token")
+
+        try:
+            tid = request.data["tid"]
+
+        except KeyError:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Transaction ID required"
+            )
+
+        try:
+            TransactionService.deleteTransaction(request_user, tid)
+
+            return api_response(
+                success=True,
+                code=status.HTTP_200_OK,
+                message="Transaction deleted"
+            )
+
+        except PermissionError as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_403_FORBIDDEN,
+                message="Permission denied",
+                errors={"detail": str(e)}
+            )
+
+        except ValueError as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_404_NOT_FOUND,
+                message="Not found",
+                errors={"detail": str(e)}
+            )
+
+        except Exception as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Error",
+                errors={"detail": str(e)}
+            )
+            
+class GetTransactionAPI(APIView):
+
+    def get(self, request):
+        request_user = get_request_user(request)
+
+        if not request_user:
+            return api_response(
+                success=False,
+                code=status.HTTP_401_UNAUTHORIZED,
+                message="Unauthorized - Invalid or missing token")
+
+        try:
+            page = int(request.GET.get("page", 0))
+            limit = int(request.GET.get("limit", 10))
+
+            filters = {}
+            if request.GET.get("type"):
+                filters["type"] = request.GET.get("type")
+
+            if request.GET.get("category"):
+                filters["category"] = request.GET.get("category")
+
+        except Exception:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Invalid query params"
+            )
+
+        try:
+            data = TransactionService.getTransaction(
+                request_user, page, limit, filters
+            )
+
+            return api_response(
+                success=True,
+                code=status.HTTP_200_OK,
+                message="Transactions fetched",
+                data=data
+            )
+
+        except PermissionError as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_403_FORBIDDEN,
+                message="Permission denied",
+                errors={"detail": str(e)}
+            )
+
+        except Exception as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Error",
+                errors={"detail": str(e)}
+            )
+            
+class TransactionInsightsAPI(APIView):
+
+    def get(self, request):
+        request_user = get_request_user(request)
+
+        if not request_user:
+            return api_response( 
+                success=False,
+                code=status.HTTP_401_UNAUTHORIZED,
+                message="Unauthorized - Invalid or missing token")
+
+        try:
+            data = TransactionService.getInsights(request_user)
+
+            return api_response(
+                success=True,
+                code=status.HTTP_200_OK,
+                message="Insights fetched",
+                data=data
+            )
+
+        except PermissionError as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_403_FORBIDDEN,
+                message="Permission denied",
+                errors={"detail": str(e)}
+            )
+
+        except Exception as e:
+            return api_response(
+                success=False,
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Error",
                 errors={"detail": str(e)}
             )

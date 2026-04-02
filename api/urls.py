@@ -13,7 +13,13 @@ urlpatterns = [
     path("api/updateUserRole", views.UpdateUserRoleAPI.as_view()),
     path("api/updateUserStatus", views.UpdateUserStatusAPI.as_view()),
     path("api/listUsers", views.ListUsersAPI.as_view()),
-    # path("api/event", views.EventAPI.as_view()),
-    # path("api/updateEvent", views.UpdateEvent.as_view()),
+    
+    path("api/addTransaction", views.AddTransactionAPI.as_view()),
+    path("api/updateTransaction", views.UpdateTransactionAPI.as_view()),
+    path("api/deleteTransaction", views.DeleteTransactionAPI.as_view()),
+    path("api/getTransactions", views.GetTransactionAPI.as_view()),
+    
+    path("api/getInsights", views.TransactionInsightsAPI.as_view()),
+
     
 ]
