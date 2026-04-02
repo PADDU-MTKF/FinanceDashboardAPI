@@ -2,10 +2,13 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
+from .views import docs_redirect
+
 
 urlpatterns = [
     path("", views.home),
     path("api/", views.home),
+    path('docs/', docs_redirect),
     
     path("api/login", views.LoginAPI.as_view()),
     path("api/createUser", views.CreateUserAPI.as_view()),

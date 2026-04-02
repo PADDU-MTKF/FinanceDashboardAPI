@@ -2,8 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-
-from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import redirect
+ 
 
 from .modules.userClass import User,UserService
 from .modules.transactionClass import Transaction,TransactionService
@@ -41,6 +41,10 @@ def get_request_user(request):
 
 
 # VIEWS ************************************************************************************************
+
+def docs_redirect(request):
+    return redirect("https://github.com/PADDU-MTKF/FinanceDashboardAPI#readme")
+
 
 @api_view(['GET'])
 def home(request):
