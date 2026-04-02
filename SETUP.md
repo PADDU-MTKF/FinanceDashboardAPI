@@ -8,7 +8,7 @@ Follow these steps to set up and run the Finance Dashboard API on your local mac
 ## 1. Clone the Repository
 Open your terminal or command prompt and run the following command to clone the project:
 ```bash
-git clone <repository_url>
+git clone https://github.com/PADDU-MTKF/FinanceDashboardAPI.git
 cd FinanceDashboard_API/financeDashboard
 ```
 
