@@ -6,7 +6,6 @@ User(username, name, role,status,hashedpasswrod)
 GodUser(One user that no one can remove) > master admin(manage users and/or all other feature) > Admin(Full access to CRUD and insights) > Analyst(Only view all data and insights) > Viewer(Only view, no insights)
     Only master Admin can access the below function
         createUsers() -> create one or multiple useres
-        updateUser() -> update the data of existing user
         updateRole() ->  Assign/update the role of a user
         updateUserStatus() -> change user from active or inactive
         listAllUsers()
@@ -37,5 +36,5 @@ Who can access what?
 Viewer -> getTransaction()
 Analyst -> getTransaction(), getInsights()
 transactionAdmin -> getTransaction(), getInsights(), addTransaction(), updateTransaction(), deleteTransaction()
-userAdmin -> createUsers(), updateUser(), updateRole(), updateUserStatus(), listAllUsers()
+userAdmin -> createUsers(), updateRole(), updateUserStatus(), listAllUsers()
 masterAdmin -> hybrid of transactionAdmin and userAdmin
