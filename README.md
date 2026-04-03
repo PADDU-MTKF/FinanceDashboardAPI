@@ -31,6 +31,23 @@ Users have specific roles (e.g., viewer, analyst, Admin, transactionAdmin, userA
 | masterAdmin | Full system access |
 
 ---
+## Default Admin User
+
+A default **God User** is automatically created with `masterAdmin` privileges.
+
+- This user **cannot be updated or deleted**
+- Has **full system access**
+
+### Login Credentials
+> Use this user to get started and manage the system.
+
+```json
+{
+  "username": "godadmin",
+  "password": "godpassword"
+}
+```
+---
 
 ## 1. General & Authentication APIs
 
