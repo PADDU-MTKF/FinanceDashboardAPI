@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/", views.home),
     path('docs/', docs_redirect),
     
+    # Authentication and User Management routes
     path("api/login", views.LoginAPI.as_view()),
     path("api/createUser", views.CreateUserAPI.as_view()),
     path("api/deleteUser", views.DeleteUserAPI.as_view()),
@@ -17,6 +18,7 @@ urlpatterns = [
     path("api/updateUserStatus", views.UpdateUserStatusAPI.as_view()),
     path("api/listUsers", views.ListUsersAPI.as_view()),
     
+    # Transaction Management routes
     path("api/addTransaction", views.AddTransactionAPI.as_view()),
     path("api/updateTransaction", views.UpdateTransactionAPI.as_view()),
     path("api/deleteTransaction", views.DeleteTransactionAPI.as_view()),

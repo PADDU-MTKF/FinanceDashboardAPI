@@ -96,10 +96,12 @@ class UserService:
 
     @staticmethod
     def _get_username_map():
+        '''Fetches the username to UID mapping from cache'''
         return cache.get(USERNAME_MAP, {})
 
     @staticmethod
     def _set_username_map(data):
+        '''Updates the username to UID mapping in cache'''
         cache.set(USERNAME_MAP, data, timeout=DATA_TIMEOUT)
 
     @staticmethod

@@ -19,6 +19,8 @@ except:
 # HELPER FUNCTIONS ***********************************************************************************
 
 def api_response(success, code, message, data=None, errors=None):
+    '''Helper function to standardize API responses'''
+    
     return Response(
         {
             "success": success,
@@ -31,6 +33,8 @@ def api_response(success, code, message, data=None, errors=None):
     )
 
 def get_request_user(request):
+    '''Helper function to validate token and get user from request headers'''
+    
     token = request.headers.get("TOKEN")
     username = request.headers.get("USERNAME")
 
@@ -43,20 +47,23 @@ def get_request_user(request):
 # VIEWS ************************************************************************************************
 
 def docs_redirect(request):
+    '''Redirect to API documentation (hosted on GitHub README)'''
     return redirect("https://github.com/PADDU-MTKF/FinanceDashboardAPI#readme")
 
 
+# Basic API status check
 @api_view(['GET'])
 def home(request):
     return api_response(
         True,
         status.HTTP_200_OK,
-        "API is working",
+        "API is working, access /docs for documentation",
         data={"status": "ok"}
     )
 
 
 class LoginAPI(APIView):
+    '''API endpoint for user login and token generation'''
 
     def post(self, request):
         try:
@@ -104,6 +111,7 @@ class LoginAPI(APIView):
 # User Management APIs **********************************************************************************
 
 class CreateUserAPI(APIView):
+    '''API endpoint for creating new users'''
 
     def post(self, request):
         # validate requesting user
@@ -174,6 +182,7 @@ class CreateUserAPI(APIView):
             )
             
 class DeleteUserAPI(APIView):
+    '''API endpoint for deleting users'''
 
     def delete(self, request):
         # validate requesting user
@@ -234,6 +243,7 @@ class DeleteUserAPI(APIView):
             )
             
 class UpdateUserRoleAPI(APIView):
+    '''API endpoint for updating user roles'''
 
     def put(self, request):
         request_user = get_request_user(request)
@@ -300,6 +310,7 @@ class UpdateUserRoleAPI(APIView):
             )
 
 class UpdateUserStatusAPI(APIView):
+    '''API endpoint for updating user status (active/inactive)'''
 
     def put(self, request):
         request_user = get_request_user(request)
@@ -366,6 +377,7 @@ class UpdateUserStatusAPI(APIView):
             )
             
 class ListUsersAPI(APIView):
+    '''API endpoint for listing all users (UserAdmin and MasterAdmin only)'''
 
     def get(self, request):
         request_user = get_request_user(request)
@@ -407,6 +419,7 @@ class ListUsersAPI(APIView):
 # Transaction Management APIs **************************************************************************
 
 class AddTransactionAPI(APIView):
+    '''API endpoint for adding new transactions (TransactionAdmin and MasterAdmin only)'''
 
     def post(self, request):
         request_user = get_request_user(request)
@@ -458,6 +471,7 @@ class AddTransactionAPI(APIView):
             )
             
 class UpdateTransactionAPI(APIView):
+    '''API endpoint for updating transactions (TransactionAdmin and MasterAdmin only)'''
 
     def put(self, request):
         request_user = get_request_user(request)
@@ -540,6 +554,7 @@ class UpdateTransactionAPI(APIView):
             )
             
 class DeleteTransactionAPI(APIView):
+    '''API endpoint for deleting transactions (TransactionAdmin and MasterAdmin only)'''
 
     def delete(self, request):
         request_user = get_request_user(request)
@@ -594,6 +609,7 @@ class DeleteTransactionAPI(APIView):
             )
             
 class GetTransactionAPI(APIView):
+    '''API endpoint for fetching transactions with pagination and optional filters (All roles)'''
 
     def get(self, request):
         request_user = get_request_user(request)
@@ -651,6 +667,7 @@ class GetTransactionAPI(APIView):
             )
             
 class TransactionInsightsAPI(APIView):
+    '''API endpoint for fetching transaction insights (Analyst, TransactionAdmin, MasterAdmin)'''
 
     def get(self, request):
         request_user = get_request_user(request)
